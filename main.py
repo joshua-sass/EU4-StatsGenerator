@@ -7,6 +7,7 @@ if __name__ == "__main__":
 	#scraping.testing()
 
 	print("gib filename")
-	filename = input()
+	#filename = input()
+	filename = "GermanyBaseline.eu4"
 
 	scraping.interact(filename)

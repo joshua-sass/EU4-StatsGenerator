@@ -22,7 +22,7 @@ class scraper:
 		current_dic.replace("\\", "/")
 
 		options = webdriver.ChromeOptions() 
-		options.add_experimental_option("excludeSwitches", ["enable-logging"])
+		options.add_experimental_option("excludeSwitches", ["enable-logging"]) #a little bit of trolling bc bluetooth wont play nice (???) idk
 
 		browser = webdriver.Chrome("C:/Users/josh/OneDrive - sassware/Documents/PythonWork/chromedriver_win32/chromedriver.exe", options=options)
 		browser.get('https://nixx.is-fantabulo.us/paperman/')
