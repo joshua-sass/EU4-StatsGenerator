@@ -46,28 +46,31 @@ class file_read:
 		campaign_stats_tples = []		
 		for stat in campaign_stats_arr:
 			#print(stat)
-			iterator = stat.find('key="')
+			searching = 'key="'
+			iterator = stat.find(searching)
 			if iterator == -1:
 				continue
-			end_iterator = stat[iterator+5:].find('"')
-			key = stat[iterator+5:iterator+5+end_iterator]
+			end_iterator = stat[iterator+:].find('"')
+			key = stat[iterator+len(searching):iterator+len(searching)+end_iterator]
 			#print(key)
 
-			iterator = stat.find('localization="')
+			searching = 'localization="'
+			iterator = stat.find(searching)
 			localization = None
 			if iterator != -1:
-				end_iterator = stat[iterator+14:].find('"')
-				localization = stat[iterator+14:iterator+14+end_iterator]
+				end_iterator = stat[iterator+len(searching):].find('"')
+				localization = stat[iterator+len(searching):iterator+len(searching)+end_iterator]
 			#print(localization)
 
-			iterator = stat.find('value=')
+			searching = 'value='
+			iterator = stat.find(searching)
 			value = None
 			if iterator != -1:
-				end_iterator = stat[iterator+6:].find(' ')
+				end_iterator = stat[iterator+len(searching):].find(' ')
 				if end_iterator == -1:
-					value = stat[iterator+6:]
+					value = stat[iterator+len(searching):]
 				else:
-					value = stat[iterator+6:iterator+6+end_iterator]
+					value = stat[iterator+len(searching):iterator+len(searching)+end_iterator]
 			#print(value)
 
 			temp_arr = []
@@ -85,11 +88,58 @@ class file_read:
 		return campaign_stats_tples
 
 	def country_stats(self):
+		#potentially track monarchs?!?
+		#war="
+		#raw_development=
+		#technology={
+		#estate={
+		#score_place=
+		#estimated_monthly_income=
+		#max_manpower=
+		#max_sailors=
+		#starting_development=
+		#innovativeness=
+		#adm_spent_indexed={
+		#dip_spent_indexed={
+		#mil_spent_indexed={
 
 		country_info  = self.important_info[1]
 		country_info_arr  = country_info.splitlines()
 
+		war_arr = []
+
+		for line in country_info_arr:
+			searching = 'war="'
+			iterator = line.find(searching)
+			if iterator != -1:
+				end_iterator = line[iterator+len(searching):].find('"')
+				war_var = line[iterator+len(searching):iterator+len(searching)+end_iterator]	
+				war_arr.append(war_var)
+				print(war_var)
+
+			searching = 'development='
+			iterator = line.find(searching)
+			if iterator != -1:
+				#end_iterator = line[iterator+len(searching):].find('"')
+				development_var = line[iterator+len(searching):]	
+
+		war_arr = list(set(war_arr)) #oopsies, randomizing probs need to think of a better way but im lazy atm
 		return country_info_arr
+
+	def file_find(self, word_find, end_char, no_end_char): #experimental, dont think ill use
+
+		country_info  = self.important_info[1]
+		country_info_arr  = country_info.splitlines()
+
+		iterator = stat.find(word_find)
+		word_found = None
+		if iterator != -1 and no_end_char is False:
+			end_iterator = stat[iterator+len(word_find):].find(end_char)
+			word_found = stat[iterator+len(word_find):iterator+len(word_find)+end_iterator]
+		elif iterator != -1 and no_end_char is True:
+			word_found = stat[iterator+len(word_find):]
+
+		return word_found
 
 	def process(self):
 
@@ -98,4 +148,4 @@ class file_read:
 		country  = self.country_stats()		
 
 		#print(campaign)
-		print(country)
+		#print(country)
