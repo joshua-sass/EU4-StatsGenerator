@@ -50,7 +50,7 @@ class file_read:
 			iterator = stat.find(searching)
 			if iterator == -1:
 				continue
-			end_iterator = stat[iterator+:].find('"')
+			end_iterator = stat[iterator+len(searching):].find('"')
 			key = stat[iterator+len(searching):iterator+len(searching)+end_iterator]
 			#print(key)
 
@@ -105,8 +105,15 @@ class file_read:
 
 		country_info  = self.important_info[1]
 		country_info_arr  = country_info.splitlines()
+		country_info_tples = []
 
 		war_arr = []
+		tech_flag = 0
+		adm_spent_flag = 0
+		dip_spent_flag = 0
+		mil_spent_flag = 0
+		tech_var = ""
+		development_var = 0
 
 		for line in country_info_arr:
 			searching = 'war="'
@@ -115,16 +122,111 @@ class file_read:
 				end_iterator = line[iterator+len(searching):].find('"')
 				war_var = line[iterator+len(searching):iterator+len(searching)+end_iterator]	
 				war_arr.append(war_var)
-				print(war_var)
+				#print(war_var)
 
-			searching = 'development='
+			searching = 'starting_development='
+			iterator = line.find(searching)
+			if iterator != -1:
+				start_dev_var = line[iterator+len(searching):]	
+				country_info_tples.append(tuple(["starting_development", start_dev_var]))	
+
+			searching = 'raw_development='
 			iterator = line.find(searching)
 			if iterator != -1:
 				#end_iterator = line[iterator+len(searching):].find('"')
-				development_var = line[iterator+len(searching):]	
+				development_var = line[iterator+len(searching):]
+				#print(development_var)
+				country_info_tples.append(tuple(["development", development_var]))
 
-		war_arr = list(set(war_arr)) #oopsies, randomizing probs need to think of a better way but im lazy atm
-		return country_info_arr
+			searching = 'technology={' #take string into 3 parts for adm, dip, mil respectively
+			iterator = line.find(searching)
+			if tech_flag == 1 or tech_flag == 2 or tech_flag == 3:
+				iterator_temp = line.find('tech=')
+				if iterator_temp != -1:
+					tech_var += line[iterator_temp+5:]
+					tech_flag += 1
+			if iterator != -1:
+				tech_flag = 1
+
+			searching = 'score_place='
+			iterator = line.find(searching)
+			if iterator != -1:
+				score_var = line[iterator+len(searching):]
+				country_info_tples.append(tuple(["place in score", score_var]))
+
+			searching = 'estimated_monthly_income='
+			iterator = line.find(searching)
+			if iterator != -1:
+				income_var = line[iterator+len(searching):]
+				country_info_tples.append(tuple(["income per month", income_var]))
+
+			searching = 'max_manpower='
+			iterator = line.find(searching)
+			if iterator != -1:
+				max_manpower_var = line[iterator+len(searching):]
+				country_info_tples.append(tuple(["max manpower", float(max_manpower_var)*1000]))
+
+			searching = 'max_sailors='
+			iterator = line.find(searching)
+			if iterator != -1:
+				max_sailors_var = line[iterator+len(searching):]
+				country_info_tples.append(tuple(["max sailors", float(max_sailors_var)]))
+
+			searching = 'innovativeness='
+			iterator = line.find(searching)
+			if iterator != -1:
+				inno_var = line[iterator+len(searching):]
+				country_info_tples.append(tuple(["innovativeness", inno_var]))
+
+			searching = 'adm_spent_indexed='
+			iterator = line.find(searching)
+			
+			if adm_spent_flag == 1:
+				temp_line = line.split()
+				adm_sum = 0
+				for admin in temp_line:
+					temp_iterator = admin.find("=")
+					adm_sum += int(admin[temp_iterator+1:])	
+				adm_spent_flag = 2
+				country_info_tples.append(tuple(["total admin spent", adm_sum]))
+
+			if iterator != -1:
+				adm_spent_flag = 1	
+
+			searching = 'dip_spent_indexed='
+			iterator = line.find(searching)
+
+			if dip_spent_flag == 1:
+				temp_line = line.split()
+				dip_sum = 0
+				for dip in temp_line:
+					temp_iterator = dip.find("=")
+					dip_sum += int(dip[temp_iterator+1:])	
+				dip_spent_flag = 2
+				country_info_tples.append(tuple(["total diplo spent", dip_sum]))
+
+
+			if iterator != -1:
+				dip_spent_flag = 1	
+
+			searching = 'mil_spent_indexed='
+			iterator = line.find(searching)
+
+			if mil_spent_flag == 1:
+				temp_line = line.split()
+				mil_sum = 0
+				for mil in temp_line:
+					temp_iterator = mil.find("=")
+					mil_sum += int(mil[temp_iterator+1:])	
+				mil_spent_flag = 2	
+				country_info_tples.append(tuple(["total mil spent", mil_sum]))
+
+			if iterator != -1:
+				mil_spent_flag = 1	
+
+		country_info_tples.append(tuple(list(["wars", set(war_arr)]))) #oopsies, randomizing probs need to think of a better way but im lazy atm
+		country_info_tples.append(tuple(["technology", tech_var[0:1], tech_var[2:3], tech_var[4:5]]))
+		return country_info_tples
 
 	def file_find(self, word_find, end_char, no_end_char): #experimental, dont think ill use
 
@@ -147,5 +249,5 @@ class file_read:
 		campaign = self.campaign_stats()
 		country  = self.country_stats()		
 
-		#print(campaign)
-		#print(country)
+		print(campaign)
+		print(country)
