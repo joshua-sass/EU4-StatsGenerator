@@ -33,30 +33,69 @@ class file_read:
 		temp = ""
 		reading = False
 		for line in campaign_info_arr:
-			if "key=" in line:
+			if "id=" in line:
 				reading = True
 			if "}" in line and reading==True:
 				reading = False
-				temp = " ".join(temp.split())
+				temp = " - ".join(temp.split())
 				campaign_stats_arr.append(temp)
 				temp = ""
 			if reading == True:
-				temp += " " + line 
+				temp += " " + line
 
-		return campaign_stats_arr
+		campaign_stats_tples = []		
+		for stat in campaign_stats_arr:
+			#print(stat)
+			iterator = stat.find('key="')
+			if iterator == -1:
+				continue
+			end_iterator = stat[iterator+5:].find('"')
+			key = stat[iterator+5:iterator+5+end_iterator]
+			#print(key)
+
+			iterator = stat.find('localization="')
+			localization = None
+			if iterator != -1:
+				end_iterator = stat[iterator+14:].find('"')
+				localization = stat[iterator+14:iterator+14+end_iterator]
+			#print(localization)
+
+			iterator = stat.find('value=')
+			value = None
+			if iterator != -1:
+				end_iterator = stat[iterator+6:].find(' ')
+				if end_iterator == -1:
+					value = stat[iterator+6:]
+				else:
+					value = stat[iterator+6:iterator+6+end_iterator]
+			#print(value)
+
+			temp_arr = []
+			temp_arr.append(key)
+			if localization is not None:
+				temp_arr.append(localization)
+			if value is not None:
+				temp_arr.append(value)
+			if len(temp_arr) > 1:
+				campaign_stats_tples.append(tuple(temp_arr))
+			else:
+				campaign_stats_tples.append(temp_arr)
+			temp_arr[:]
+
+		return campaign_stats_tples
 
 	def country_stats(self):
 
 		country_info  = self.important_info[1]
 		country_info_arr  = country_info.splitlines()
 
-		return " "
+		return country_info_arr
 
 	def process(self):
 
-		#im currently parsing twice blocks out of the code, hence two strings in the array
+		#im currently parsing two blocks out of the code, hence two strings in the array
 		campaign = self.campaign_stats()
 		country  = self.country_stats()		
 
-		print(campaign)
+		#print(campaign)
 		print(country)
