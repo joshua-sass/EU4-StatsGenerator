@@ -6,8 +6,9 @@ if __name__ == "__main__":
 
 	#scraping.testing()
 
-	print("gib filename")
+	print("gib filename (please dont forget .eu4 extension or i have to ask again)") #need to add exception handling here!
 	#filename = input()
 	filename = "GermanyBaseline.eu4"
-
-	scraping.interact(filename)
+	
+	processing = file_read(scraping.interact(filename))
+	processing.process()

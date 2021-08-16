@@ -45,3 +45,4 @@ class scraper:
 		shutil.move(path_to_newfile, current_dic +"/nonironman_" + filename)	
 
 		browser.close()
+		return(current_dic +"/nonironman_" + filename)
